@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "Get training logs",
+      "method": "GET",
+      "path": "/?user_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "logs": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add training log entry",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1,
+        "exercise_name": "Приседания",
+        "sets": 4,
+        "reps": 10,
+        "weight": 80.5,
+        "notes": "Хорошая тренировка"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

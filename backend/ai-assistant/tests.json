@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Ask AI assistant a question",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "question": "Как правильно делать приседания?"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "answer": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
