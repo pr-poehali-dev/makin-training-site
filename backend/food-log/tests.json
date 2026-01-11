@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Search food by query",
+      "method": "GET",
+      "path": "/?action=search_food&query=chicken",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add food to log",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1,
+        "date": "2026-01-11",
+        "food_name": "Курица грудка",
+        "grams": 150
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

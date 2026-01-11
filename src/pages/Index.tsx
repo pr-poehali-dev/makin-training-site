@@ -10,6 +10,7 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import AuthDialog from '@/components/AuthDialog';
 import TrainingDiary from '@/components/TrainingDiary';
+import FoodDiary from '@/components/FoodDiary';
 import { api, User } from '@/lib/api';
 
 interface Program {
@@ -138,6 +139,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [diaryOpen, setDiaryOpen] = useState(false);
+  const [foodDiaryOpen, setFoodDiaryOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -427,58 +429,70 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">ДМИТРИЙ МАКИН</h1>
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+          <h1 className="text-lg sm:text-2xl font-bold tracking-tight">ДМИТРИЙ МАКИН</h1>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-4">
             {user ? (
               <>
                 <Button 
                   variant="ghost" 
-                  className="gap-2"
+                  className="gap-1 sm:gap-2 text-xs sm:text-base px-2 sm:px-4 hidden md:flex"
                   onClick={() => setCertOpen(true)}
                 >
-                  <Icon name="Award" size={20} />
-                  СЕРТИФИКАТЫ
+                  <Icon name="Award" size={16} className="sm:w-5 sm:h-5" />
+                  <span className="hidden lg:inline">СЕРТИФИКАТЫ</span>
                 </Button>
                 
                 <Button 
                   variant="ghost" 
-                  className="gap-2"
+                  className="gap-1 sm:gap-2 text-xs sm:text-base px-2 sm:px-4"
                   onClick={() => setDiaryOpen(true)}
+                  size="sm"
                 >
-                  <Icon name="BookOpen" size={20} />
-                  ДНЕВНИК
+                  <Icon name="Dumbbell" size={16} className="sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">ТРЕНИРОВКИ</span>
+                </Button>
+
+                <Button 
+                  variant="ghost" 
+                  className="gap-1 sm:gap-2 text-xs sm:text-base px-2 sm:px-4"
+                  onClick={() => setFoodDiaryOpen(true)}
+                  size="sm"
+                >
+                  <Icon name="Apple" size={16} className="sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">ПИТАНИЕ</span>
                 </Button>
                 
                 {purchasedPrograms.length > 0 && (
                   <Button 
                     variant="ghost" 
-                    className="gap-2"
+                    className="gap-1 sm:gap-2 text-xs sm:text-base px-2 sm:px-4 hidden lg:flex"
                     onClick={() => setMyPurchasesOpen(true)}
                   >
-                    <Icon name="FolderOpen" size={20} />
-                    МОИ ПОКУПКИ
+                    <Icon name="FolderOpen" size={16} className="sm:w-5 sm:h-5" />
+                    <span className="hidden xl:inline">МОИ ПОКУПКИ</span>
                   </Button>
                 )}
                 
                 <Button 
                   variant="ghost" 
-                  className="gap-2"
+                  size="icon"
+                  className="w-8 h-8 sm:w-10 sm:h-10"
                   onClick={handleLogout}
                 >
-                  <Icon name="LogOut" size={20} />
-                  {user.name}
+                  <Icon name="LogOut" size={16} className="sm:w-5 sm:h-5" />
                 </Button>
               </>
             ) : (
               <Button 
                 variant="ghost" 
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-base px-2 sm:px-4"
                 onClick={() => setAuthOpen(true)}
+                size="sm"
               >
-                <Icon name="User" size={20} />
-                ВОЙТИ
+                <Icon name="User" size={16} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">ВОЙТИ</span>
               </Button>
             )}
             
@@ -548,30 +562,30 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="pt-20">
-        <section className="min-h-screen flex flex-col items-center justify-center px-6 animate-fade-in">
-          <h2 className="text-6xl md:text-8xl font-bold text-center mb-12 tracking-tight">
+      <main className="pt-16 sm:pt-20">
+        <section className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 animate-fade-in">
+          <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold text-center mb-8 sm:mb-12 tracking-tight">
             ПРОГРАММЫ<br />ТРЕНИРОВОК
           </h2>
           
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-3 sm:gap-4 w-full max-w-sm md:max-w-none">
             <Button
               size="lg"
-              className="text-xl py-8 px-12 h-auto font-bold"
+              className="text-base sm:text-xl py-6 sm:py-8 px-8 sm:px-12 h-auto font-bold w-full md:w-auto"
               onClick={() => scrollToSection('strength')}
             >
               СИЛОВЫЕ
             </Button>
             <Button
               size="lg"
-              className="text-xl py-8 px-12 h-auto font-bold"
+              className="text-base sm:text-xl py-6 sm:py-8 px-8 sm:px-12 h-auto font-bold w-full md:w-auto"
               onClick={() => scrollToSection('basketball')}
             >
               БАСКЕТБОЛ
             </Button>
             <Button
               size="lg"
-              className="text-xl py-8 px-12 h-auto font-bold"
+              className="text-base sm:text-xl py-6 sm:py-8 px-8 sm:px-12 h-auto font-bold w-full md:w-auto"
               onClick={() => scrollToSection('nutrition')}
             >
               ПИТАНИЕ
@@ -579,18 +593,18 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="strength" className="py-20 px-6 animate-slide-up">
+        <section id="strength" className="py-12 sm:py-20 px-4 sm:px-6 animate-slide-up">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-5xl font-bold mb-12 text-center">СИЛОВАЯ ПОДГОТОВКА</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center">СИЛОВАЯ ПОДГОТОВКА</h2>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {programs.filter(p => p.category === 'strength').map(program => (
-                <Card key={program.id} className="p-6 hover:border-primary transition-colors">
-                  <h3 className="text-2xl font-bold mb-4">{program.title}</h3>
-                  <p className="text-muted-foreground mb-6 min-h-[80px]">{program.description}</p>
-                  <p className="text-3xl font-bold text-primary mb-6">{program.price} ₽</p>
+                <Card key={program.id} className="p-4 sm:p-6 hover:border-primary transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{program.title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 min-h-[60px] sm:min-h-[80px]">{program.description}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary mb-4 sm:mb-6">{program.price} ₽</p>
                   <Button 
-                    className="w-full" 
+                    className="w-full text-sm sm:text-base" 
                     onClick={() => addToCart(program)}
                   >
                     ДОБАВИТЬ В КОРЗИНУ
@@ -601,18 +615,18 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="basketball" className="py-20 px-6 bg-secondary/30">
+        <section id="basketball" className="py-12 sm:py-20 px-4 sm:px-6 bg-secondary/30">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-5xl font-bold mb-12 text-center">БАСКЕТБОЛЬНАЯ ПОДГОТОВКА</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center">БАСКЕТБОЛЬНАЯ ПОДГОТОВКА</h2>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {programs.filter(p => p.category === 'basketball').map(program => (
-                <Card key={program.id} className="p-6 hover:border-primary transition-colors">
-                  <h3 className="text-2xl font-bold mb-4">{program.title}</h3>
-                  <p className="text-muted-foreground mb-6 min-h-[80px]">{program.description}</p>
-                  <p className="text-3xl font-bold text-primary mb-6">{program.price} ₽</p>
+                <Card key={program.id} className="p-4 sm:p-6 hover:border-primary transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{program.title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 min-h-[60px] sm:min-h-[80px]">{program.description}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary mb-4 sm:mb-6">{program.price} ₽</p>
                   <Button 
-                    className="w-full"
+                    className="w-full text-sm sm:text-base"
                     onClick={() => addToCart(program)}
                   >
                     ДОБАВИТЬ В КОРЗИНУ
@@ -623,18 +637,18 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="nutrition" className="py-20 px-6">
+        <section id="nutrition" className="py-12 sm:py-20 px-4 sm:px-6">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-5xl font-bold mb-12 text-center">СПОРТИВНОЕ ПИТАНИЕ</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center">СПОРТИВНОЕ ПИТАНИЕ</h2>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {programs.filter(p => p.category === 'nutrition').map(program => (
-                <Card key={program.id} className="p-6 hover:border-primary transition-colors">
-                  <h3 className="text-2xl font-bold mb-4">{program.title}</h3>
-                  <p className="text-muted-foreground mb-6 min-h-[80px]">{program.description}</p>
-                  <p className="text-3xl font-bold text-primary mb-6">{program.price} ₽</p>
+                <Card key={program.id} className="p-4 sm:p-6 hover:border-primary transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{program.title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 min-h-[60px] sm:min-h-[80px]">{program.description}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary mb-4 sm:mb-6">{program.price} ₽</p>
                   <Button 
-                    className="w-full"
+                    className="w-full text-sm sm:text-base"
                     onClick={() => openCalculator(program)}
                   >
                     РАССЧИТАТЬ И ДОБАВИТЬ
@@ -645,17 +659,17 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="testimonials" className="py-20 px-6 bg-secondary/30">
+        <section id="testimonials" className="py-12 sm:py-20 px-4 sm:px-6 bg-secondary/30">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-5xl font-bold mb-12 text-center">РЕЗУЛЬТАТЫ УЧЕНИКОВ</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center">РЕЗУЛЬТАТЫ УЧЕНИКОВ</h2>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {testimonials.map((testimonial, index) => (
-                <Card key={index} className="p-8 text-center hover:border-primary transition-colors">
-                  <div className="text-6xl mb-4">{testimonial.image}</div>
-                  <h3 className="text-xl font-bold mb-2">{testimonial.name}</h3>
-                  <p className="text-primary font-semibold mb-3">{testimonial.result}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.program}</p>
+                <Card key={index} className="p-6 sm:p-8 text-center hover:border-primary transition-colors">
+                  <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">{testimonial.image}</div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2">{testimonial.name}</h3>
+                  <p className="text-sm sm:text-base text-primary font-semibold mb-2 sm:mb-3">{testimonial.result}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{testimonial.program}</p>
                 </Card>
               ))}
             </div>
@@ -666,6 +680,8 @@ const Index = () => {
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} onAuth={setUser} />
       
       <TrainingDiary open={diaryOpen} onOpenChange={setDiaryOpen} user={user} />
+      
+      <FoodDiary open={foodDiaryOpen} onOpenChange={setFoodDiaryOpen} user={user} />
       
       <Dialog open={certOpen} onOpenChange={setCertOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
