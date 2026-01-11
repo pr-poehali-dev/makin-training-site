@@ -67,6 +67,7 @@ export const FoodDiary = ({ open, onOpenChange, user }: FoodDiaryProps) => {
       loadGoals();
       loadLogs();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user, date]);
 
   const loadGoals = async () => {
@@ -130,17 +131,23 @@ export const FoodDiary = ({ open, onOpenChange, user }: FoodDiaryProps) => {
         })
       });
       
-      if (!response.ok) throw new Error('Ошибка добавления');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Ошибка добавления');
+      }
       
-      toast({ title: 'Успешно', description: 'Продукт добавлен в дневник' });
       setSelectedFood(null);
       setGrams('100');
       setSearchQuery('');
       setSearchResults([]);
       setView('diary');
-      loadLogs();
+      
+      await loadLogs();
+      
+      toast({ title: 'Успешно', description: 'Продукт добавлен в дневник' });
     } catch (error: any) {
-      toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
+      console.error('Error adding food:', error);
+      toast({ title: 'Ошибка', description: error.message || 'Не удалось добавить продукт', variant: 'destructive' });
     }
   };
 
@@ -152,12 +159,16 @@ export const FoodDiary = ({ open, onOpenChange, user }: FoodDiaryProps) => {
         body: JSON.stringify({ id: logId })
       });
       
-      if (!response.ok) throw new Error('Ошибка удаления');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Ошибка удаления');
+      }
       
+      await loadLogs();
       toast({ title: 'Успешно', description: 'Запись удалена' });
-      loadLogs();
     } catch (error: any) {
-      toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
+      console.error('Error deleting log:', error);
+      toast({ title: 'Ошибка', description: error.message || 'Не удалось удалить запись', variant: 'destructive' });
     }
   };
 
@@ -178,13 +189,17 @@ export const FoodDiary = ({ open, onOpenChange, user }: FoodDiaryProps) => {
         })
       });
       
-      if (!response.ok) throw new Error('Ошибка сохранения');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Ошибка сохранения');
+      }
       
-      toast({ title: 'Успешно', description: 'Цели обновлены' });
-      loadGoals();
+      await loadGoals();
       setView('diary');
+      toast({ title: 'Успешно', description: 'Цели обновлены' });
     } catch (error: any) {
-      toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
+      console.error('Error saving goals:', error);
+      toast({ title: 'Ошибка', description: error.message || 'Не удалось сохранить цели', variant: 'destructive' });
     }
   };
 
@@ -205,6 +220,10 @@ export const FoodDiary = ({ open, onOpenChange, user }: FoodDiaryProps) => {
   };
 
   const preview = calculatePreview();
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
