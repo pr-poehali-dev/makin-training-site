@@ -123,6 +123,9 @@ const Index = () => {
   const [selectedNutritionProgram, setSelectedNutritionProgram] = useState<Program | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [isPurchased, setIsPurchased] = useState(false);
+  const [myPurchasesOpen, setMyPurchasesOpen] = useState(false);
+  const [purchasedPrograms, setPurchasedPrograms] = useState<CartItem[]>([]);
+  const [selectedPurchasedProgram, setSelectedPurchasedProgram] = useState<CartItem | null>(null);
   
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
@@ -204,12 +207,158 @@ const Index = () => {
   };
 
   const handlePayment = () => {
+    setPurchasedPrograms([...purchasedPrograms, ...cart]);
+    setCart([]);
     setCheckoutOpen(false);
     setIsPurchased(true);
     toast({
       title: '🎉 Оплата успешна!',
       description: 'Спасибо за покупку! Программы доступны в разделе "Мои покупки"',
     });
+  };
+
+  const getProgramContent = (programId: string) => {
+    const content: Record<string, { weeks: string; exercises: string[]; recommendations: string[] }> = {
+      's1': {
+        weeks: '12 недель',
+        exercises: [
+          'Приседания со штангой: 4 подхода по 8-12 повторений',
+          'Жим штанги лёжа: 4 подхода по 8-12 повторений',
+          'Становая тяга: 3 подхода по 6-8 повторений',
+          'Жим штанги стоя: 3 подхода по 8-10 повторений',
+          'Подтягивания широким хватом: 3 подхода до отказа'
+        ],
+        recommendations: [
+          'Тренировки 3 раза в неделю',
+          'Отдых между подходами: 2-3 минуты',
+          'Прогрессия нагрузки: +2.5 кг каждую неделю',
+          'Обязательная разминка 10-15 минут'
+        ]
+      },
+      's2': {
+        weeks: '10 недель',
+        exercises: [
+          'Круговая тренировка: 5 кругов',
+          'Приседания с гирей: 15 повторений',
+          'Отжимания с хлопком: 12 повторений',
+          'Выпады с гантелями: 10 повторений на ногу',
+          'Бёрпи: 15 повторений'
+        ],
+        recommendations: [
+          'Тренировки 4 раза в неделю',
+          'Отдых между кругами: 90 секунд',
+          'Кардио после силовой: 15-20 минут',
+          'Контроль пульса: 130-150 уд/мин'
+        ]
+      },
+      's3': {
+        weeks: '16 недель',
+        exercises: [
+          'Присед со штангой (85-95% от макс): 5x3',
+          'Жим лёжа (85-95% от макс): 5x3',
+          'Становая тяга (85-95% от макс): 5x2',
+          'Подсобка: жим ногами, жим узким хватом',
+          'Работа с цепями и резиной'
+        ],
+        recommendations: [
+          'Тренировки 4-5 раз в неделю',
+          'Отдых между подходами: 3-5 минут',
+          'Периодизация: лёгкая/средняя/тяжёлая недели',
+          'Обязательная работа с тренером'
+        ]
+      },
+      'b1': {
+        weeks: '8 недель',
+        exercises: [
+          'Броски с места (разные дистанции): 100 бросков',
+          'Броски после движения: 50 бросков',
+          'Штрафные броски: 50 бросков',
+          'Броски с сопротивлением: 30 бросков',
+          'Игровые броски: 20 бросков'
+        ],
+        recommendations: [
+          'Тренировки 5-6 раз в неделю',
+          'Анализ техники на видео',
+          'Работа над механикой броска',
+          'Фиксация статистики попаданий'
+        ]
+      },
+      'b2': {
+        weeks: '8 недель',
+        exercises: [
+          'Дриблинг на месте (обе руки): 5 минут',
+          'Слалом между конусами: 10 повторений',
+          'Ускорения с ведением: 10x30 метров',
+          'Дриблинг в прыжке: 3 подхода по 1 минуте',
+          'Двойной шаг с ведением: 20 повторений'
+        ],
+        recommendations: [
+          'Тренировки 4-5 раз в неделю',
+          'Работа над слабой рукой',
+          'Упражнения на координацию',
+          'Тренировки в игровых ситуациях'
+        ]
+      },
+      'b3': {
+        weeks: '12 недель',
+        exercises: [
+          'Разбор игровых комбинаций: видео-анализ',
+          'Ситуационные упражнения 2v2, 3v3',
+          'Игра в защите: позиционирование',
+          'Чтение действий соперника',
+          'Принятие решений под давлением'
+        ],
+        recommendations: [
+          'Просмотр игр NBA с анализом',
+          'Работа с тренером',
+          'Ведение игрового дневника',
+          'Участие в спаррингах'
+        ]
+      },
+      'n1': {
+        weeks: 'Индивидуально',
+        exercises: [],
+        recommendations: [
+          'Калорийность: расчётная (профицит +300-500 ккал)',
+          'Белки: 2г на кг веса',
+          'Жиры: 1г на кг веса',
+          'Углеводы: остальные калории',
+          'Приёмы пищи: 4-5 раз в день',
+          'Питьевой режим: 30-40 мл на кг веса',
+          'Пример завтрака: овсянка 100г, яйца 3шт, банан',
+          'Пример обеда: рис 150г, курица 200г, овощи'
+        ]
+      },
+      'n2': {
+        weeks: 'Индивидуально',
+        exercises: [],
+        recommendations: [
+          'Калорийность: расчётная (дефицит -300-500 ккал)',
+          'Белки: 2-2.5г на кг веса',
+          'Жиры: 0.8-1г на кг веса',
+          'Углеводы: сниженные, акцент на утро',
+          'Приёмы пищи: 5-6 раз в день',
+          'Питьевой режим: 40-50 мл на кг веса',
+          'Читмил: 1 раз в неделю',
+          'Кардио: 3-4 раза в неделю по 30 минут'
+        ]
+      },
+      'n3': {
+        weeks: 'Индивидуально',
+        exercises: [],
+        recommendations: [
+          'Калорийность: расчётная (поддержка)',
+          'Белки: 2г на кг веса',
+          'Жиры: 1-1.2г на кг веса',
+          'Углеводы: акцент на тренировочные дни',
+          'Приёмы пищи: 4-5 раз в день',
+          'Питание до тренировки: за 1.5-2 часа',
+          'Питание после тренировки: в течение 30-60 минут',
+          'Добавки: протеин, креатин, BCAA (по желанию)'
+        ]
+      }
+    };
+    return content[programId] || { weeks: '', exercises: [], recommendations: [] };
   };
 
   return (
@@ -220,7 +369,11 @@ const Index = () => {
           
           <div className="flex items-center gap-4">
             {isPurchased && (
-              <Button variant="ghost" className="gap-2">
+              <Button 
+                variant="ghost" 
+                className="gap-2"
+                onClick={() => setMyPurchasesOpen(true)}
+              >
                 <Icon name="FolderOpen" size={20} />
                 МОИ ПОКУПКИ
               </Button>
@@ -455,6 +608,146 @@ const Index = () => {
               РАССЧИТАТЬ И ДОБАВИТЬ В КОРЗИНУ
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={myPurchasesOpen} onOpenChange={setMyPurchasesOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Мои покупки</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {purchasedPrograms.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">У вас пока нет купленных программ</p>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {purchasedPrograms.map((program, index) => (
+                  <Card 
+                    key={index} 
+                    className="p-4 cursor-pointer hover:border-primary transition-colors"
+                    onClick={() => setSelectedPurchasedProgram(program)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/20 p-3 rounded-lg">
+                        <Icon 
+                          name={program.category === 'strength' ? 'Dumbbell' : program.category === 'basketball' ? 'Trophy' : 'Apple'} 
+                          size={24} 
+                          className="text-primary"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold">{program.title}</h3>
+                        {program.calculatedData && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {program.calculatedData.calories} ккал | Б: {program.calculatedData.protein}г
+                          </p>
+                        )}
+                      </div>
+                      <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={selectedPurchasedProgram !== null} onOpenChange={() => setSelectedPurchasedProgram(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          {selectedPurchasedProgram && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-3xl">{selectedPurchasedProgram.title}</DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-6 py-4">
+                {selectedPurchasedProgram.calculatedData && (
+                  <Card className="p-6 bg-primary/10 border-primary/30">
+                    <h3 className="font-bold text-lg mb-4">Ваши индивидуальные показатели</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Рост</p>
+                        <p className="text-2xl font-bold">{selectedPurchasedProgram.calculatedData.height} см</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Вес</p>
+                        <p className="text-2xl font-bold">{selectedPurchasedProgram.calculatedData.weight} кг</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Возраст</p>
+                        <p className="text-2xl font-bold">{selectedPurchasedProgram.calculatedData.age} лет</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Калории</p>
+                        <p className="text-2xl font-bold text-primary">{selectedPurchasedProgram.calculatedData.calories}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Белки</p>
+                        <p className="text-xl font-bold">{selectedPurchasedProgram.calculatedData.protein}г</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Жиры</p>
+                        <p className="text-xl font-bold">{selectedPurchasedProgram.calculatedData.fats}г</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Углеводы</p>
+                        <p className="text-xl font-bold">{selectedPurchasedProgram.calculatedData.carbs}г</p>
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
+                {(() => {
+                  const content = getProgramContent(selectedPurchasedProgram.id);
+                  return (
+                    <>
+                      {content.weeks && (
+                        <div>
+                          <Badge className="text-sm px-3 py-1">{content.weeks}</Badge>
+                        </div>
+                      )}
+
+                      {content.exercises.length > 0 && (
+                        <div>
+                          <h3 className="font-bold text-xl mb-4">Программа тренировок</h3>
+                          <div className="space-y-3">
+                            {content.exercises.map((exercise, idx) => (
+                              <Card key={idx} className="p-4 hover:border-primary/50 transition-colors">
+                                <div className="flex items-start gap-3">
+                                  <div className="bg-primary/20 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-primary font-bold text-sm">{idx + 1}</span>
+                                  </div>
+                                  <p className="flex-1">{exercise}</p>
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {content.recommendations.length > 0 && (
+                        <div>
+                          <h3 className="font-bold text-xl mb-4">Рекомендации</h3>
+                          <div className="space-y-2">
+                            {content.recommendations.map((rec, idx) => (
+                              <div key={idx} className="flex items-start gap-3">
+                                <Icon name="CheckCircle2" size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                                <p className="flex-1">{rec}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
