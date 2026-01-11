@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -8,6 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import AuthDialog from '@/components/AuthDialog';
+import TrainingDiary from '@/components/TrainingDiary';
+import { api, User } from '@/lib/api';
 
 interface Program {
   id: string;
@@ -116,13 +119,32 @@ const testimonials = [
   }
 ];
 
+const certificates = [
+  {
+    title: 'Сертификат тренера по силовым тренировкам',
+    issuer: 'Международная федерация силовых видов спорта',
+    year: '2020',
+    image: 'https://cdn.poehali.dev/projects/0c4ccab3-ec87-4811-9c91-c1f1775f0d5f/files/26224306-3454-4374-a9cf-39855b7c2447.jpg'
+  },
+  {
+    title: 'Сертификат по спортивному питанию',
+    issuer: 'Академия спортивной нутрициологии',
+    year: '2021',
+    image: 'https://cdn.poehali.dev/projects/0c4ccab3-ec87-4811-9c91-c1f1775f0d5f/files/eac7ff5c-4eb0-4c67-8b14-9ed3d6c95950.jpg'
+  }
+];
+
 const Index = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [diaryOpen, setDiaryOpen] = useState(false);
+  const [certOpen, setCertOpen] = useState(false);
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [selectedNutritionProgram, setSelectedNutritionProgram] = useState<Program | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [isPurchased, setIsPurchased] = useState(false);
   const [myPurchasesOpen, setMyPurchasesOpen] = useState(false);
   const [purchasedPrograms, setPurchasedPrograms] = useState<CartItem[]>([]);
   const [selectedPurchasedProgram, setSelectedPurchasedProgram] = useState<CartItem | null>(null);
@@ -132,6 +154,37 @@ const Index = () => {
   const [age, setAge] = useState('');
 
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      loadPurchases(JSON.parse(savedUser).id);
+    }
+  }, []);
+
+  const loadPurchases = async (userId: number) => {
+    try {
+      const purchases = await api.getPurchases(userId);
+      setPurchasedPrograms(purchases.map(p => ({
+        id: p.program_id,
+        title: p.program_title,
+        category: p.program_category,
+        description: '',
+        price: p.price,
+        calculatedData: p.calculated_data
+      })));
+    } catch (error) {
+      console.error('Error loading purchases:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setPurchasedPrograms([]);
+    toast({ title: 'Вы вышли из аккаунта' });
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -206,15 +259,25 @@ const Index = () => {
     setCheckoutOpen(true);
   };
 
-  const handlePayment = () => {
-    setPurchasedPrograms([...purchasedPrograms, ...cart]);
-    setCart([]);
-    setCheckoutOpen(false);
-    setIsPurchased(true);
-    toast({
-      title: '🎉 Оплата успешна!',
-      description: 'Спасибо за покупку! Программы доступны в разделе "Мои покупки"',
-    });
+  const handlePayment = async () => {
+    if (!user) {
+      setCheckoutOpen(false);
+      setAuthOpen(true);
+      return;
+    }
+
+    try {
+      await api.savePurchases(user.id, cart);
+      setPurchasedPrograms([...purchasedPrograms, ...cart]);
+      setCart([]);
+      setCheckoutOpen(false);
+      toast({
+        title: '🎉 Оплата успешна!',
+        description: 'Спасибо за покупку! Программы доступны в разделе "Мои покупки"',
+      });
+    } catch (error: any) {
+      toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
+    }
   };
 
   const getProgramContent = (programId: string) => {
@@ -368,14 +431,54 @@ const Index = () => {
           <h1 className="text-2xl font-bold tracking-tight">ДМИТРИЙ МАКИН</h1>
           
           <div className="flex items-center gap-4">
-            {isPurchased && (
+            {user ? (
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="gap-2"
+                  onClick={() => setCertOpen(true)}
+                >
+                  <Icon name="Award" size={20} />
+                  СЕРТИФИКАТЫ
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="gap-2"
+                  onClick={() => setDiaryOpen(true)}
+                >
+                  <Icon name="BookOpen" size={20} />
+                  ДНЕВНИК
+                </Button>
+                
+                {purchasedPrograms.length > 0 && (
+                  <Button 
+                    variant="ghost" 
+                    className="gap-2"
+                    onClick={() => setMyPurchasesOpen(true)}
+                  >
+                    <Icon name="FolderOpen" size={20} />
+                    МОИ ПОКУПКИ
+                  </Button>
+                )}
+                
+                <Button 
+                  variant="ghost" 
+                  className="gap-2"
+                  onClick={handleLogout}
+                >
+                  <Icon name="LogOut" size={20} />
+                  {user.name}
+                </Button>
+              </>
+            ) : (
               <Button 
                 variant="ghost" 
                 className="gap-2"
-                onClick={() => setMyPurchasesOpen(true)}
+                onClick={() => setAuthOpen(true)}
               >
-                <Icon name="FolderOpen" size={20} />
-                МОИ ПОКУПКИ
+                <Icon name="User" size={20} />
+                ВОЙТИ
               </Button>
             )}
             
@@ -559,6 +662,35 @@ const Index = () => {
           </div>
         </section>
       </main>
+
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} onAuth={setUser} />
+      
+      <TrainingDiary open={diaryOpen} onOpenChange={setDiaryOpen} user={user} />
+      
+      <Dialog open={certOpen} onOpenChange={setCertOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Сертификаты тренера</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid md:grid-cols-2 gap-6 py-4">
+            {certificates.map((cert, index) => (
+              <Card key={index} className="overflow-hidden hover:border-primary transition-colors">
+                <img 
+                  src={cert.image} 
+                  alt={cert.title}
+                  className="w-full h-64 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="font-bold mb-2">{cert.title}</h3>
+                  <p className="text-sm text-muted-foreground">{cert.issuer}</p>
+                  <p className="text-sm text-primary font-semibold mt-1">{cert.year}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
         <DialogContent>
